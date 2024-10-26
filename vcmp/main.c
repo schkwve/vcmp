@@ -25,6 +25,8 @@ int main() {
     }
     
     log_info("=== Initialized everything. Happy chatting! === ");
+
     event_base_dispatch(base);
+    event_base_free(base);
     return 0;
 }
