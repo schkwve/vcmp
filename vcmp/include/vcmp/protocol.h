@@ -1,7 +1,7 @@
 #ifndef _VCMP_PROTOCOL_H
 #define _VCMP_PROTOCOL_H
 
-#include <cstdint>
+#include <stdint.h>
 
 typedef struct vcmp_header {
     uint8_t magic[5];
