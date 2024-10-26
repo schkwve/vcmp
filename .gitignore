@@ -1,0 +1,12 @@
+#########
+# CMAKE #
+#########
+vcmp/CMakeFiles
+vcmp/cmake_install.cmake
+vcmp/CMakeCache.txt
+vcmp/Makefile
+
+##########
+# BINARY #
+##########
+vcmp/vcmp_client
