@@ -2,7 +2,6 @@
 #include <event2/event.h>
 #include <vcmp/dashboard.h>
 #include <vcmp/listener.h>
-#include <vcmp/util/uuid.h>
 
 int main()
 {
@@ -26,7 +25,6 @@ int main()
         return 1;
     }
 
-    log_info("Test UUID = %s", gen_uuid());
     log_info("=== Initialized everything. Happy chatting! === ");
 
     event_base_dispatch(base);
