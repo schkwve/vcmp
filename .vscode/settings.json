@@ -2,4 +2,5 @@
     "clangd.fallbackFlags": [
         "--include-directory=${workspaceFolder}/vcmp/include",
     ],
+    "editor.formatOnSave": true
 }
