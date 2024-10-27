@@ -1,4 +1,4 @@
-#include <include/vcmp/protocol.h>
+#include <vcmp/protocol.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,30 +6,35 @@
 #include <time.h>
 #include <uuid/uuid.h>
 
-int vcmp_gen_header(uint8_t *buf, const uint8_t buf_len)
+#include "../lib/log.h"
+
+int vcmp_gen_header(uint8_t *buf, const uint32_t buf_len)
 {
-
-    vcmp_header_t header = {0};
-
-    uint8_t magic[5] = {'V', 'C', 'M', 'P', '\0'};
-    memcpy(header.magic, magic, sizeof(header.magic));
-
-    header.version = 1; // version 1.0
-
-    uuid_t uuid;
-    uuid_generate(uuid);
-    memcpy(&header.message_uuid[0], uuid, sizeof(uint64_t));
-    memcpy(&header.message_uuid[1], uuid + sizeof(uint64_t), sizeof(uint64_t));
-
-    header.timestamp = 0;
-    time_t current_time = time(NULL);
-    if (current_time == (time_t)-1) {
-        perror("Timestamp is NULL!");
+    if (buf_len < sizeof(vcmp_header_t)) {
+        log_error("Cannot fit VCMP header into buf!");
         return 1;
     }
-    header.timestamp = (uint64_t)current_time;
 
-    uint8_t buffer[sizeof(header)];
+    vcmp_header_t *header = (vcmp_header_t *)buf;
+
+    header->magic[0] = 'V';
+    header->magic[1] = 'C';
+    header->magic[2] = 'M';
+    header->magic[3] = 'P';
+    header->magic[4] = '\0';
+
+    header->version = VCMP_VERSION;
+    uuid_generate((uint8_t *)header->message_uuid);
+
+    time_t current_time = time(NULL);
+    if (current_time == (time_t)-1) {
+        log_error("Timestamp is NULL!");
+        return 1;
+    }
+
+    header->timestamp = (uint64_t)current_time;
+
+    /* Fill out and think of a nice interface to fill next 2 header members */
 
     return 0;
 }
