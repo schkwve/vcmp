@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 project(vcmp_client)
-add_executable(vcmp_client main.c src/dashboard.c src/listener.c lib/log.c)
+add_executable(vcmp_client main.c src/dashboard.c src/listener.c lib/log.c src/protocol.c)
 target_include_directories(vcmp_client PUBLIC include)
 target_link_libraries(vcmp_client PRIVATE event uuid)

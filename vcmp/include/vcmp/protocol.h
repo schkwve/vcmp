@@ -12,4 +12,6 @@ typedef struct vcmp_header {
     uint32_t payload_size;
 } __attribute__((packed)) vcmp_header_t;
 
+int vcmp_gen_header(uint8_t *buf, const uint8_t buf_len);
+
 #endif // _VCMP_PROTOCOL_H
