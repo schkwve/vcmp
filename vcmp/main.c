@@ -1,10 +1,11 @@
 #include "lib/log.h"
 #include <event2/event.h>
-#include <vcmp/listener.h>
 #include <vcmp/dashboard.h>
+#include <vcmp/listener.h>
 #include <vcmp/util/uuid.h>
 
-int main() {
+int main()
+{
     log_info("=== VCMP ===");
 
     struct event_base *base = event_base_new();
@@ -24,11 +25,9 @@ int main() {
         event_base_free(base);
         return 1;
     }
-    
-    
+
     log_info("Test UUID = %s", gen_uuid());
     log_info("=== Initialized everything. Happy chatting! === ");
-
 
     event_base_dispatch(base);
     event_base_free(base);

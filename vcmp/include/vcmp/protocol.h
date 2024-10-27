@@ -12,4 +12,4 @@ typedef struct vcmp_header {
     uint32_t payload_size;
 } __attribute__((packed)) vcmp_header_t;
 
-#endif
+#endif // _VCMP_PROTOCOL_H
