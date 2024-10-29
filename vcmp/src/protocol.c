@@ -8,7 +8,8 @@
 
 #include "../lib/log.h"
 
-int vcmp_gen_header(uint8_t *buf, const uint32_t buf_len)
+int vcmp_gen_header(uint8_t *buf, const uint32_t buf_len,
+                    const uint32_t payload_size)
 {
     if (buf_len < sizeof(vcmp_header_t)) {
         log_error("Cannot fit VCMP header into buf!");
@@ -26,15 +27,8 @@ int vcmp_gen_header(uint8_t *buf, const uint32_t buf_len)
     header->version = VCMP_VERSION;
     uuid_generate((uint8_t *)header->message_uuid);
 
-    time_t current_time = time(NULL);
-    if (current_time == (time_t)-1) {
-        log_error("Timestamp is NULL!");
-        return 1;
-    }
-
-    header->timestamp = (uint64_t)current_time;
-
-    /* Fill out and think of a nice interface to fill next 2 header members */
+    header->timestamp = (uint64_t)time(NULL);
+    header->payload_size = payload_size;
 
     return 0;
 }
