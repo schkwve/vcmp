@@ -8,15 +8,15 @@
 
 #include "../lib/log.h"
 
-int vcmp_gen_header(uint8_t *buf, const uint32_t buf_len,
-                    const uint32_t payload_size)
+int vcmp_gen_data_header(uint8_t *buf, const uint32_t buf_len,
+                         const uint32_t payload_size)
 {
-    if (buf_len < sizeof(vcmp_header_t)) {
+    if (buf_len < sizeof(vcmp_data_header_t)) {
         log_error("Cannot fit VCMP header into buf!");
         return 1;
     }
 
-    vcmp_header_t *header = (vcmp_header_t *)buf;
+    vcmp_data_header_t *header = (vcmp_data_header_t *)buf;
 
     header->magic[0] = 'V';
     header->magic[1] = 'C';
