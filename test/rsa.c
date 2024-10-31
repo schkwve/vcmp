@@ -1,15 +1,12 @@
 #include <openssl/bio.h>
+#include <openssl/crypto.h>
 #include <openssl/evp.h>
 #include <openssl/rsa.h>
 #include <openssl/x509.h>
+#include <stdint.h>
 #include <stdio.h>
 
-struct rsa_keys {
-    BIO *priv;
-    BIO *pub;
-};
-
-int gen_rsa(struct rsa_keys *keys)
+int gen_rsa(EVP_PKEY **pkey)
 {
     // init ctx for key gen
     EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
@@ -31,63 +28,50 @@ int gen_rsa(struct rsa_keys *keys)
     }
 
     // gen key
-    EVP_PKEY *pkey = NULL;
-    if (EVP_PKEY_keygen(ctx, &pkey) <= 0) {
+    EVP_PKEY *_pkey = NULL;
+    if (EVP_PKEY_keygen(ctx, &_pkey) <= 0) {
         fprintf(stderr, "4\n");
         EVP_PKEY_CTX_free(ctx);
         return 1;
     }
 
-    // allocate BIOs
-    BIO *priv_bio = BIO_new(BIO_s_mem());
-    BIO *pub_bio = BIO_new(BIO_s_mem());
-    if (!priv_bio || !pub_bio) {
-        fprintf(stderr, "5\n");
-        EVP_PKEY_free(pkey);
-        EVP_PKEY_CTX_free(ctx);
-        return 1;
-    }
-
-    // encode in DER
-    if (i2d_PrivateKey_bio(priv_bio, pkey) <= 0) {
-        fprintf(stderr, "6\n");
-        BIO_free(priv_bio);
-        BIO_free(pub_bio);
-        EVP_PKEY_free(pkey);
-        EVP_PKEY_CTX_free(ctx);
-        return 1;
-    }
-
-    if (i2d_PUBKEY_bio(pub_bio, pkey) <= 0) {
-        fprintf(stderr, "7\n");
-        BIO_free(priv_bio);
-        BIO_free(pub_bio);
-        EVP_PKEY_free(pkey);
-        EVP_PKEY_CTX_free(ctx);
-        return 1;
-    }
-
-    EVP_PKEY_free(pkey);
     EVP_PKEY_CTX_free(ctx);
 
-    keys->priv = priv_bio;
-    keys->pub = pub_bio;
-
+    *pkey = _pkey;
     return 0;
+}
+
+uint8_t *get_rsa_der_pub(EVP_PKEY *pkey, int *len)
+{
+    uint8_t *rsa_key = NULL;
+    int _len = i2d_PUBKEY(pkey, &rsa_key);
+    if (_len <= 0)
+        return NULL;
+    *len = _len;
+    return rsa_key;
 }
 
 int main()
 {
-    struct rsa_keys keys = {0};
-    if (gen_rsa(&keys) != 0) {
+    EVP_PKEY *pkey = NULL;
+    if (gen_rsa(&pkey) != 0) {
         printf("failed to gen rsa keys\n");
         return 1;
     }
 
     printf("generated rsa keys!\n");
 
-    // free keys
-    BIO_free(keys.priv);
-    BIO_free(keys.pub);
+    int pub_key_len = 0;
+    uint8_t *pub_key = get_rsa_der_pub(pkey, &pub_key_len);
+    if (!pub_key) {
+        printf("failed to get rsa pub key\n");
+        EVP_PKEY_free(pkey);
+        return 1;
+    }
+
+    printf("rsa der pub key len: %d\n", pub_key_len);
+
+    OPENSSL_free(pub_key);
+    EVP_PKEY_free(pkey);
     return 0;
 }
