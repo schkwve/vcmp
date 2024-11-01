@@ -8,27 +8,34 @@
 
 #include "../lib/log.h"
 
-int vcmp_gen_data_header(uint8_t *buf, const uint32_t buf_len,
-                         const uint32_t payload_size)
+static const uint8_t VCMP_MAGIC[5] = {'V', 'C', 'M', 'P', '\0'};
+
+void vcmp_gen_header(vcmp_header_t *header, const uint8_t type)
 {
-    if (buf_len < sizeof(vcmp_data_header_t)) {
-        log_error("Cannot fit VCMP header into buf!");
-        return 1;
-    }
-
-    vcmp_data_header_t *header = (vcmp_data_header_t *)buf;
-
-    header->magic[0] = 'V';
-    header->magic[1] = 'C';
-    header->magic[2] = 'M';
-    header->magic[3] = 'P';
-    header->magic[4] = '\0';
-
+    memcpy(header->magic, VCMP_MAGIC, sizeof(VCMP_MAGIC));
     header->version = VCMP_VERSION;
-    uuid_generate((uint8_t *)header->message_uuid);
+    header->type = type;
+}
 
-    header->timestamp = (uint64_t)time(NULL);
-    header->payload_size = payload_size;
+vcmp_handshake_t *vcmp_gen_hs_header(const uint8_t type, const uint32_t keylen,
+                                     const uint8_t *pubkey, int *outlen)
+{
+    vcmp_handshake_t *h =
+        (vcmp_handshake_t *)malloc(sizeof(vcmp_handshake_t) + keylen);
+    if (!h) {
+        log_error("Failed to allocate vcmp handshake");
+        return NULL;
+    }
+    vcmp_gen_header(&h->header, VCMP_TYPE_HS_INIT);
+    h->keylen = keylen;
+    memcpy(h->pubkey, pubkey, keylen);
+    return h;
+}
 
-    return 0;
+void vcmp_gen_data_header(vcmp_data_t *data, const uint32_t payload_size)
+{
+    vcmp_gen_header(&data->header, VCMP_TYPE_DATA);
+    uuid_generate((uint8_t *)data->message_uuid);
+    data->timestamp = (uint64_t)time(NULL);
+    data->len = payload_size;
 }
