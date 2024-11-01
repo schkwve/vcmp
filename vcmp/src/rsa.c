@@ -5,25 +5,25 @@ EVP_PKEY *rsa_generate()
 {
     EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
     if (!ctx) {
-        log_error("Failed to alloc a evp pkey ctx\n");
+        log_error("Failed to alloc a evp pkey ctx");
         return NULL;
     }
 
     if (EVP_PKEY_keygen_init(ctx) <= 0) {
-        log_error("Failed to init evp pkey keygen\n");
+        log_error("Failed to init evp pkey keygen");
         EVP_PKEY_CTX_free(ctx);
         return NULL;
     }
 
     if (EVP_PKEY_CTX_set_rsa_keygen_bits(ctx, RSA_BITS) <= 0) {
-        log_error("Failed to set rsa bits to evp pkey ctx\n");
+        log_error("Failed to set rsa bits to evp pkey ctx");
         EVP_PKEY_CTX_free(ctx);
         return NULL;
     }
 
     EVP_PKEY *pkey = NULL;
     if (EVP_PKEY_keygen(ctx, &pkey) <= 0) {
-        log_error("Failed to generate keys\n");
+        log_error("Failed to generate keys");
         EVP_PKEY_CTX_free(ctx);
         return NULL;
     }
@@ -37,7 +37,7 @@ uint8_t *rsa_get_der_pubkey(EVP_PKEY *pubkey, int *outlen)
     uint8_t *key = NULL;
     *outlen = i2d_PUBKEY(pubkey, &key);
     if (*outlen <= 0) {
-        log_error("Failed to convert key to DER\n");
+        log_error("Failed to convert key to DER");
         return NULL;
     }
     return key;
@@ -48,7 +48,7 @@ EVP_PKEY *rsa_load_der_pubkey(const uint8_t *pubkey, const size_t keylen)
     const uint8_t *p = pubkey;
     EVP_PKEY *pkey = d2i_PUBKEY(NULL, &p, keylen);
     if (!pkey) {
-        log_error("Failed loading public key from DER\n");
+        log_error("Failed loading public key from DER");
         return NULL;
     }
     return pkey;
@@ -59,31 +59,31 @@ uint8_t *rsa_encrypt(const uint8_t *buf, const size_t buflen, EVP_PKEY *pubkey,
 {
     EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new(pubkey, NULL);
     if (!ctx) {
-        log_error("Failed to init evp pkey keygen\n");
+        log_error("Failed to init evp pkey keygen");
         return NULL;
     }
 
     if (EVP_PKEY_encrypt_init(ctx) <= 0) {
-        log_error("Failed to init evp pkey ctx encryption\n");
+        log_error("Failed to init evp pkey ctx encryption");
         EVP_PKEY_CTX_free(ctx);
         return NULL;
     }
 
     if (EVP_PKEY_encrypt(ctx, NULL, outlen, buf, buflen) <= 0) {
-        log_error("Failed to determine encrypted data len\n");
+        log_error("Failed to determine encrypted data len");
         EVP_PKEY_CTX_free(ctx);
         return NULL;
     }
 
     uint8_t *encrypted = (uint8_t *)malloc(*outlen);
     if (!encrypted) {
-        log_error("Failed to alloc encrypted data buf\n");
+        log_error("Failed to alloc encrypted data buf");
         EVP_PKEY_CTX_free(ctx);
         return NULL;
     }
 
     if (EVP_PKEY_encrypt(ctx, encrypted, outlen, buf, buflen) <= 0) {
-        log_error("Failed to encrypt data buf\n");
+        log_error("Failed to encrypt data buf");
         free(encrypted);
         EVP_PKEY_CTX_free(ctx);
         return NULL;
@@ -98,31 +98,31 @@ uint8_t *rsa_decrypt(const uint8_t *buf, const size_t buflen, EVP_PKEY *privkey,
 {
     EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new(privkey, NULL);
     if (!ctx) {
-        log_error("Failed to init evp pkey keygen\n");
+        log_error("Failed to init evp pkey keygen");
         return NULL;
     }
 
     if (EVP_PKEY_decrypt_init(ctx) <= 0) {
-        log_error("Failed to init evp pkey ctx decryption\n");
+        log_error("Failed to init evp pkey ctx decryption");
         EVP_PKEY_CTX_free(ctx);
         return NULL;
     }
 
     if (EVP_PKEY_decrypt(ctx, NULL, outlen, buf, buflen) <= 0) {
-        log_error("Failed to determine decrypted data len\n");
+        log_error("Failed to determine decrypted data len");
         EVP_PKEY_CTX_free(ctx);
         return NULL;
     }
 
     uint8_t *decrypted = (uint8_t *)malloc(*outlen);
     if (!decrypted) {
-        log_error("Failed to alloc decrypted data buf\n");
+        log_error("Failed to alloc decrypted data buf");
         EVP_PKEY_CTX_free(ctx);
         return NULL;
     }
 
     if (EVP_PKEY_encrypt(ctx, decrypted, outlen, buf, buflen) <= 0) {
-        log_error("Failed to decrypt data buf\n");
+        log_error("Failed to decrypt data buf");
         free(decrypted);
         EVP_PKEY_CTX_free(ctx);
         return NULL;
