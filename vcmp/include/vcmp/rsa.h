@@ -2,7 +2,7 @@
 #define _VCMP_RSA_H
 
 #include <openssl/x509.h>
-#include <stdlib.h>
+#include <stdint.h>
 
 #define RSA_BITS 2048
 
