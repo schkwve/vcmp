@@ -3,14 +3,17 @@
 
 #include <stdint.h>
 
+static const uint8_t VCMP_MAGIC[5] = {'V', 'C', 'M', 'P', '\0'};
 #define VCMP_VERSION 1
 
-// Handshake types
+// Packet IDS
 
-#define VCMP_TYPE_HS_INIT 1
-#define VCMP_TYPE_HS_ACK 2
+#define VCMP_TYPE_VERIFY 1
 
-#define VCMP_TYPE_DATA 3
+#define VCMP_TYPE_HS_INIT 2
+#define VCMP_TYPE_HS_ACK 3
+
+#define VCMP_TYPE_DATA 4
 
 typedef struct vcmp_header {
     uint8_t magic[5];

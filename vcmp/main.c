@@ -1,11 +1,17 @@
 #include "lib/log.h"
 #include <event2/event.h>
+#include <unistd.h>
 #include <vcmp/api.h>
 #include <vcmp/listener.h>
 
 int main()
 {
     log_info("=== VCMP ===");
+
+    // Seed rand
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    srand((unsigned int)(ts.tv_nsec ^ ts.tv_sec ^ getpid()));
 
     struct event_base *base = event_base_new();
     if (!base) {

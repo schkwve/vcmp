@@ -8,8 +8,6 @@
 
 #include "../lib/log.h"
 
-static const uint8_t VCMP_MAGIC[5] = {'V', 'C', 'M', 'P', '\0'};
-
 void vcmp_gen_header(vcmp_header_t *header, const uint8_t type)
 {
     memcpy(header->magic, VCMP_MAGIC, sizeof(VCMP_MAGIC));
