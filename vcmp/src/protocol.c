@@ -18,7 +18,7 @@ void vcmp_gen_header(vcmp_header_t *header, const uint8_t type)
 }
 
 vcmp_handshake_t *vcmp_gen_hs_header(const uint8_t type, const uint32_t keylen,
-                                     const uint8_t *pubkey, int *outlen)
+                                     const uint8_t *pubkey)
 {
     vcmp_handshake_t *h =
         (vcmp_handshake_t *)malloc(sizeof(vcmp_handshake_t) + keylen);

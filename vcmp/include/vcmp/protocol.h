@@ -34,7 +34,7 @@ typedef struct vcmp_data {
 
 void vcmp_gen_header(vcmp_header_t *header, const uint8_t type);
 vcmp_handshake_t *vcmp_gen_hs_header(const uint8_t type, const uint32_t keylen,
-                                     const uint8_t *pubkey, int *outlen);
+                                     const uint8_t *pubkey);
 void vcmp_gen_data_header(vcmp_data_t *data, const uint32_t payload_size);
 
 #endif // _VCMP_PROTOCOL_H
