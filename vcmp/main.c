@@ -13,13 +13,13 @@ int main()
         return 1;
     }
 
-    if (vcmp_listener_init(base, "127.0.0.1", 44444) != 0) {
+    if (vcmp_listener_init(base, "127.0.0.1", 55555) != 0) {
         log_error("Failed to initialize VCMP listener.");
         event_base_free(base);
         return 1;
     }
 
-    if (vcmp_api_init(base, "127.0.0.1", 55555) != 0) {
+    if (vcmp_api_init(base, "127.0.0.1", 44444) != 0) {
         log_error("Failed to initialize VCMP API.");
         event_base_free(base);
         return 1;
