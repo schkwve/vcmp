@@ -5,73 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Very Cool Message Platform</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f4f4f9;
-        }
-
-        .chat-container {
-            width: 100%;
-            max-width: 500px;
-            padding: 20px;
-            background: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        #chatLog {
-            height: 300px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            overflow-y: auto;
-            margin-bottom: 10px;
-            background: #fafafa;
-            font-size: 0.9em;
-        }
-
-        #messageInput {
-            width: calc(100% - 100px);
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        #sendButton {
-            width: 90px;
-            padding: 8px;
-            border: none;
-            background: #28a745;
-            color: #fff;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        #sendButton:hover {
-            background: #218838;
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
+    <!-- Top Bar -->
+    <div class="topbar">
+        <div class="logo">VCMP</div>
+        <button id="modeToggle">Light Mode</button>
+    </div>
+
+    <!-- Chat Container -->
     <div class="chat-container">
         <div class="input-group">
             <input type="text" id="hostname" placeholder="Hostname">
@@ -84,35 +28,8 @@
         </div>
     </div>
 
-    <script>
-        const socket = new WebSocket("ws://localhost:44444");
-
-        const chatLog = document.getElementById("chatLog");
-        const messageInput = document.getElementById("messageInput");
-        const sendButton = document.getElementById("sendButton");
-
-        socket.addEventListener("open", (event) => {
-            console.log("Connected!!");
-        });
-        socket.addEventListener("message", (event) => {
-            console.log("Message from server ", event.data);
-        });
-        socket.addEventListener("error", (event) => {
-            console.error("WebSocket error observed:", event);
-        });
-        socket.addEventListener("close", (event) => {
-            console.log("Connection closed:", event);
-        });
-
-        sendButton.addEventListener("click", () => {
-            const message = messageInput.value;
-            if (message.trim()) {
-                chatLog.innerHTML += `<div>${message}</div>`;
-                messageInput.value = "";  // Clear the input
-                chatLog.scrollTop = chatLog.scrollHeight;  // Scroll to the bottom
-            }
-        });
-    </script>
+    <script src="js/index.js"></script>
+    <script src="js/toggle-mode.js"></script> <!-- New script for mode toggle -->
 </body>
 
 </html>
