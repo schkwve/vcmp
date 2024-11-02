@@ -143,3 +143,54 @@ body.light-mode #chatLog {
 #sendButton:hover {
     background: #454e5f;
 }
+
+/* Main Container */
+.main-container {
+    display: flex;
+    flex-direction: row-reverse;
+    /* Place members list on the right */
+    gap: 20px;
+    padding-top: 70px;
+    /* Offset for top bar */
+}
+
+.members-container {
+    width: 200px;
+    background-color: #3b4252;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: white;
+    height: auto;
+}
+
+.members-container h3 {
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+#membersList {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 10px;
+}
+
+#membersList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.remove-button {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    padding: 2px 5px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.remove-button:hover {
+    background-color: #c9302c;
+}
