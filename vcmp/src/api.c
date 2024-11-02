@@ -1,4 +1,5 @@
 #include "../lib/log.h"
+#include "../lib/yyjson.h"
 #include <vcmp/api.h>
 #include <websockets/frame.h>
 #include <websockets/websockets.h>
@@ -13,6 +14,14 @@ static void read_cb(struct bufferevent *bev, const uint8_t opcode,
     }
     case WS_OPCODE_TEXT: {
         log_debug("Data received: %.*s", (int)len, (char *)payload);
+
+        yyjson_doc *doc = yyjson_read(payload, len, 0);
+        yyjson_val *root = yyjson_doc_get_root(doc);
+
+        // root["action"]
+        yyjson_val *name = yyjson_obj_get(root, "action");
+
+        yyjson_doc_free(doc);
         break;
     }
     case WS_OPCODE_BINARY: {

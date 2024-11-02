@@ -8,7 +8,7 @@
 #define VCMP_PEER_STAGE_NONE 0
 #define VCMP_PEER_STAGE_PUBKEY_WAIT 1
 #define VCMP_PEER_STAGE_PUBKEY_CHECK 2
-#define VCMP_PEER_READY 3
+#define VCMP_PEER_STAGE_READY 3
 
 typedef struct vcmp_peer {
     EVP_PKEY *pubkey;

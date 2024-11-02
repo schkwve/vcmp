@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 project(vcmp_client)
-add_executable(vcmp_client main.c src/api.c src/listener.c lib/log.c src/protocol.c src/rsa.c src/util/randdata.c)
+add_executable(vcmp_client main.c src/api.c src/listener.c lib/log.c lib/yyjson.c src/protocol.c src/rsa.c src/util/randdata.c)
 target_include_directories(vcmp_client PUBLIC include)
 target_link_libraries(vcmp_client PRIVATE event uuid websockets crypto)

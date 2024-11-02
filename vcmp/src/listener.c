@@ -258,7 +258,7 @@ static void read_cb(struct bufferevent *bev, void *ctx)
         }
 
         log_info("Peer is ready to communicate with!");
-        peer->stage = VCMP_PEER_READY;
+        peer->stage = VCMP_PEER_STAGE_READY;
         break;
     }
     }
