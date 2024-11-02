@@ -8,6 +8,7 @@
 #include <openssl/crypto.h>
 #include <openssl/evp.h>
 #include <stdlib.h>
+#include <vcmp/api.h>
 #include <vcmp/listener.h>
 #include <vcmp/protocol.h>
 #include <vcmp/rsa.h>

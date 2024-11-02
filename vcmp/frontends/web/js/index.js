@@ -29,14 +29,15 @@ function parseData(data) {
     try {
         const pdata = JSON.parse(data);  // Parse JSON data
         console.log("Message from server:", data);
+        console.log(pdata.username)
 
-        if (!pdata.action) {
+        if (!pdata.event) {
             console.error("Data is not found in the Message!");
         }
         
-        if (pdata.action == "user_join") {
+        if (pdata.event == "user_join") {
             addMember(pdata.username);
-        } else if (pdata.action == "user_leave") {
+        } else if (pdata.event == "user_leave") {
             removeMember(pdata.username);
         }
 
@@ -45,18 +46,13 @@ function parseData(data) {
     }
 }
 
-
 socket.addEventListener("open", (event) => {
     addMember("You");
     console.log("Websockets opened");
-
-    // example event
-    parseData('{"action": "user_join", "username": "test"}');
-    parseData('{"action": "user_join", "username": "test2"}')
-    //parseData('{"action": "user_leave", "username": "test"}');
 });
 socket.addEventListener("message", (event) => {
     console.log("Message from server ", event.data);
+    parseData(event.data)
 });
 socket.addEventListener("error", (event) => {
     console.error("WebSocket error observed:", event);
