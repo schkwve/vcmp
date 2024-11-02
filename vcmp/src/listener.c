@@ -236,6 +236,8 @@ static void read_cb(struct bufferevent *bev, void *ctx)
 
         size_t declen = 0;
         uint8_t *dec = rsa_decrypt(h->payload, h->len, keypair, &declen);
+        evbuffer_drain(input, len);
+
         if (!dec) {
             log_error("Failed to decrypt authenticity payload");
             EVP_PKEY_free(peer->pubkey);
@@ -244,7 +246,10 @@ static void read_cb(struct bufferevent *bev, void *ctx)
             return;
         }
 
-        if (memcmp(peer->authenticity, dec, sizeof(peer->authenticity)) != 0) {
+        int ret = memcmp(peer->authenticity, dec, sizeof(peer->authenticity));
+        free(dec);
+
+        if (ret != 0) {
             log_error("Peer failed to verify authenticity");
             EVP_PKEY_free(peer->pubkey);
             free(peer);
@@ -253,7 +258,6 @@ static void read_cb(struct bufferevent *bev, void *ctx)
         }
 
         log_info("Peer is ready to communicate with!");
-        evbuffer_drain(input, len);
         peer->stage = VCMP_PEER_READY;
         break;
     }
