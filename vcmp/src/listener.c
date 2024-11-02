@@ -178,10 +178,10 @@ static void read_cb(struct bufferevent *bev, void *ctx)
         vcmp_data_t *d = (vcmp_data_t *)buf;
         vcmp_gen_data_header(d, enclen);
         memcpy(d->payload, enc, enclen);
+        free(enc);
 
         int ret = bufferevent_write(bev, buf, sizeof(buf));
         free(buf);
-        free(enc);
 
         if (ret != 0) {
             log_error("Failed to send a fake public key authenticity packet");
