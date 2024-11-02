@@ -46,5 +46,5 @@ cmake ..
 cmake --build .
 ./vcmp_client
 ```
-### License
+# License
 This project is licensed under the MIT License. For more details, please refer to the [LICENSE](./LICENSE) file.
