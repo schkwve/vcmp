@@ -2,8 +2,8 @@
 #include "../lib/yyjson.h"
 #include <event2/bufferevent.h>
 #include <vcmp/api.h>
-#include <websockets/frame.h>
-#include <websockets/websockets.h>
+#include <vcmp/websockets/frame.h>
+#include <vcmp/websockets/websockets.h>
 
 static struct bufferevent *api_user_bev = NULL;
 
