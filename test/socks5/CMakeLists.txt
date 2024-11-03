@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.10)
+project(socks5_test)
+find_package(Libevent REQUIRED)
+add_executable(socks5_test test.c ../../vcmp/src/socks5.c ../../vcmp/lib/log.c)
+target_include_directories(socks5_test PUBLIC ../../vcmp/include)
+target_link_libraries(socks5_test PRIVATE libevent::core)

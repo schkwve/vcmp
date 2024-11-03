@@ -13,6 +13,7 @@ add_executable(vcmp_client main.c
     src/listener.c
     src/protocol.c
     src/rsa.c
+    src/socks5.c
 
     src/util/randdata.c
 
