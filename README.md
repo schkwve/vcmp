@@ -34,6 +34,7 @@ Ensure the following libraries are installed:
 - [libevent](https://github.com/libevent/libevent)
 - [ws (WebSocket library)](https://github.com/splexas/ws)
 - [OpenSSL](https://github.com/openssl/openssl)
+- libuuid (package `util-linux` in many Linux distributions)
 
 ### Building & Running
 
