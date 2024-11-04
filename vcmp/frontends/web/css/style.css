@@ -27,6 +27,17 @@ input[type="number"] {
     appearance: textfield;
 }
 
+input:disabled {
+    background-color: #c0c0c0;
+	color: #888; 
+	border: 1px solid #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+body.light-mode input:disabled {
+	background-color: #9a9a9a;
+}
 
 .logo {
     font-size: 1.5em;
