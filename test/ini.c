@@ -1,12 +1,27 @@
-#include "ini.h"
-#include "log.h"
-
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 enum parser_state { READY_FOR_DATA, COMMENT, SECTION_NAME, KEY, VALUE };
+
+struct ini_keyval {
+    char *name;
+    char *value;
+
+    struct ini_keyval *next;
+};
+
+struct ini_section {
+    char *name;
+    struct ini_keyval *keyvals;
+    struct ini_section *next;
+};
+
+typedef struct ini_config {
+    struct ini_section *sections;
+    struct ini_keyval *global_keyvals;
+} ini_config;
 
 /**
  * Creates a new section list.
@@ -15,7 +30,7 @@ struct ini_section *new_section(const char *name)
 {
     struct ini_section *new = malloc(sizeof(struct ini_section));
     if (new == NULL) {
-        log_error("Failed to allocate memory for new section.");
+        printf("Failed to allocate memory for new section.\n");
         return NULL;
     }
 
@@ -33,7 +48,7 @@ struct ini_section *add_section(struct ini_section **root, const char *name)
     struct ini_section **cur_section;
 
     if (root == NULL) {
-        log_error("Invalid section root specified.");
+        printf("Invalid section root specified.\n");
         return NULL;
     }
 
@@ -53,7 +68,7 @@ struct ini_keyval *new_keyval(const char *name, const char *value)
 {
     struct ini_keyval *new = malloc(sizeof(struct ini_keyval));
     if (new == NULL) {
-        log_error("Failed to allocate memory for new key-value pair.");
+        printf("Failed to allocate memory for new key-value pair.\n");
         return NULL;
     }
 
@@ -70,12 +85,12 @@ struct ini_keyval *new_keyval(const char *name, const char *value)
 struct ini_section *find_or_create_section(ini_config *cfg, const char *name)
 {
     if (cfg == NULL) {
-        log_error("Invalid configuration root specified.");
+        printf("Invalid configuration root specified.\n");
         return NULL;
     }
 
     if (name == NULL || name[0] == '\0') {
-        log_error("Invalid section name specified.");
+        printf("Invalid section name specified.\n");
         return NULL;
     }
 
@@ -90,12 +105,12 @@ struct ini_section *find_section(ini_config *cfg, const char *name)
     struct ini_section *cur_section;
 
     if (cfg == NULL) {
-        log_error("Invalid configuration root specified.");
+        printf("Invalid configuration root specified.\n");
         return NULL;
     }
 
     if (name == NULL || name[0] == '\0') {
-        log_error("Invalid section name specified.");
+        printf("Invalid section name specified.\n");
         return NULL;
     }
 
@@ -133,12 +148,12 @@ void assign_keyval_to_section(struct ini_section *section, const char *name,
                               const char *value)
 {
     if (section == NULL) {
-        log_error("Invalid section specified.");
+        printf("Invalid section specified.\n");
         return;
     }
 
     if (name == NULL || name[0] == '\0') {
-        log_error("Invalid key name specified.");
+        printf("Invalid key name specified.\n");
         return;
     }
 
@@ -152,12 +167,12 @@ void assign_keyval_to_root(struct ini_config *cfg, const char *name,
                            const char *value)
 {
     if (cfg == NULL) {
-        log_error("Invalid configuration root specified.");
+        printf("Invalid configuration root specified.\n");
         return;
     }
 
     if (name == NULL || name[0] == '\0') {
-        log_error("Invalid key name specified.");
+        printf("Invalid key name specified.\n");
         return;
     }
 
@@ -172,12 +187,12 @@ void assign_keyval(struct ini_config *cfg, const char *section,
                    const char *name, const char *value)
 {
     if (cfg == NULL) {
-        log_error("Invalid configuration root specified.");
+        printf("Invalid configuration root specified.\n");
         return;
     }
 
     if (name == NULL || name[0] == '\0') {
-        log_error("Invalid key name specified.");
+        printf("Invalid key name specified.\n");
         return;
     }
 
@@ -203,7 +218,7 @@ ini_config *ini_create(void)
 {
     ini_config *new = malloc(sizeof(struct ini_config));
     if (new == NULL) {
-        log_error("Failed to allocate memory for configuration structure.");
+        printf("Failed to allocate memory for configuration structure.\n");
         return NULL;
     }
 
@@ -269,12 +284,12 @@ char *ini_get_value(ini_config *cfg, const char *section, const char *key)
     struct ini_keyval *cur_keyval;
 
     if (cfg == NULL) {
-        log_error("Supplied invalid configuration structure.");
+        printf("Supplied invalid configuration structure.\n");
         return NULL;
     }
 
     if (key == NULL || key[0] == '\0') {
-        log_error("Supplied invalid key name.");
+        printf("Supplied invalid key name.\n");
         return NULL;
     }
 
@@ -284,7 +299,7 @@ char *ini_get_value(ini_config *cfg, const char *section, const char *key)
     else {
         struct ini_section *sec = find_section(cfg, section);
         if (sec == NULL) {
-            log_warn("Specified section '%s' was not found.", section);
+            printf("Specified section '%s' was not found.\n", section);
             return NULL;
         }
         cur_keyval = sec->keyvals;
@@ -299,53 +314,6 @@ char *ini_get_value(ini_config *cfg, const char *section, const char *key)
     }
 
     return NULL;
-}
-
-/**
- * Parse a configuration file.
- */
-ini_config *ini_parse(const char *filepath)
-{
-    ini_config *cfg = NULL;
-    FILE *file = NULL;
-    char *filebuf = NULL;
-    ssize_t filesize = 0;
-
-    if (filepath == NULL || filepath[0] == '\0') {
-        log_error("Supplied invalid configuration file path.");
-        return NULL;
-    }
-
-    file = fopen(filepath, "rb");
-    if (!file) {
-        log_error("Failed to open '%s': %s", filepath, strerror(errno));
-        goto cleanup;
-    }
-
-    fseek(file, 0, SEEK_END);
-    filesize = ftell(file);
-    rewind(file);
-
-    filebuf = malloc(filesize);
-    if (!filebuf) {
-        log_error("Failed to allocate %d bytes.", filesize);
-        goto cleanup;
-    }
-
-    if (fread(filebuf, filesize, 1, file) == 1) {
-        cfg = ini_parsebuf(filebuf);
-    }
-
-cleanup:
-    if (file) {
-        fclose(file);
-    }
-
-    if (filebuf) {
-        free(filebuf);
-    }
-
-    return cfg;
 }
 
 /**
@@ -370,7 +338,7 @@ ini_config *ini_parsebuf(const char *buf)
     // This function will probably never be called from outside of this library/
     // but it's better to do some checks to be safe.
     if (buf == NULL || buf[0] == '\0') {
-        log_error("Invalid buffer.");
+        printf("Invalid buffer.\n");
         return NULL;
     }
 
@@ -407,7 +375,7 @@ ini_config *ini_parsebuf(const char *buf)
             int i = 0;
             while (*bufp != ']' && i != 255) {
                 if (*bufp == '\0' || *bufp == '\n') {
-                    log_error("Invalid section.");
+                    printf("Invalid section.\n");
                     state = READY_FOR_DATA;
 
                     goto fail;
@@ -426,7 +394,7 @@ ini_config *ini_parsebuf(const char *buf)
             bufp--; // take last cycle back
             while (*bufp != ' ' && *bufp != '\t' && *bufp != '=' && i != 256) {
                 if (*bufp == '\0' || *bufp == '\n') {
-                    log_error("Invalid key-value pair.");
+                    printf("Invalid key-value pair.\n");
                     state = READY_FOR_DATA;
 
                     goto fail;
@@ -436,12 +404,11 @@ ini_config *ini_parsebuf(const char *buf)
 
             while (*bufp != '=') {
                 if (*bufp == '\0' || *bufp == '\n') {
-                    log_error("Invalid key-value pair.");
+                    printf("Invalid key-value pair.\n");
                     state = READY_FOR_DATA;
 
                     goto fail;
                 }
-
                 bufp++;
             }
 
@@ -473,7 +440,7 @@ ini_config *ini_parsebuf(const char *buf)
             break;
         }
         default: {
-            log_error("State machine broke.");
+            printf("State machine broke.\n");
 
             goto fail;
             break;
@@ -490,4 +457,48 @@ fail:
         ini_free(cfg);
     }
     return NULL;
+}
+
+int main(void)
+{
+    char *test_ini = "# This is a test of an INI parser\n"
+                     "; (comments are prefixed with either # or ;)\n"
+                     "global=variable123\n"
+                     "[section1]\n"
+                     "coolvar=one\n"
+                     "[section2]\n"
+                     "coolvar=two\n"
+                     "test=test\n"
+                     "[section3]\n";
+
+    ini_config *cfg = ini_parsebuf(test_ini);
+    char *tmp;
+
+    printf("Test 1: ini_get_value() --");
+    fflush(stdout);
+    tmp = ini_get_value(cfg, "section1", "coolvar");
+    if (strcmp(tmp, "one") != 0) {
+        printf(" FAILED!\nExpected: one; Got: %s\n", tmp);
+    }
+    else {
+        puts(" PASSED");
+    }
+
+    printf("Test 2: ini_get_value() --");
+    fflush(stdout);
+    tmp = ini_get_value(cfg, "section2", "coolvar");
+    if (tmp == NULL) {
+        printf(" FAILED!\nExpected: two; Got: (not found)\n");
+    }
+    else if (strcmp(tmp, "two") != 0) {
+        printf(" FAILED!\nExpected: two; Got: %s\n", tmp);
+    }
+    else {
+        printf(" PASSED\n");
+    }
+
+    printf("All tests done! Freeing allocated memory...\n");
+    ini_free(cfg);
+
+    return 0;
 }
