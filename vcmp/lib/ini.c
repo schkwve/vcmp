@@ -221,6 +221,13 @@ void ini_free(ini_config *cfg)
     if (!cfg)
         return;
 
+    cur_keyval = cfg->global_keyvals;
+    while (cur_keyval != NULL) {
+        next_keyval = cur_keyval->next;
+        free(cur_keyval);
+        cur_keyval = next_keyval;
+    }
+
     cur_section = cfg->sections;
     if (cur_section == NULL) {
         goto final;
@@ -228,6 +235,8 @@ void ini_free(ini_config *cfg)
 
     while (cur_section != NULL) {
         next_section = cur_section->next;
+
+        cur_keyval = cur_section->keyvals;
         while (cur_keyval != NULL) {
             next_keyval = cur_keyval->next;
             free(cur_keyval->name);
@@ -241,7 +250,6 @@ void ini_free(ini_config *cfg)
 
         cur_section = next_section;
     }
-
 final:
     free(cfg);
 }
@@ -422,7 +430,7 @@ ini_config *ini_parsebuf(const char *buf)
                 tmp[i++] = *bufp++;
             }
 
-            while (*bufp != '=') {
+            while (*bufp++ != '=') {
                 if (*bufp == '\0' || *bufp == '\n') {
                     log_error("Invalid key-value pair.");
                     state = READY_FOR_DATA;

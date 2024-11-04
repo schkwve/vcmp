@@ -27,7 +27,7 @@ char *ini_get_value(ini_config *cfg, const char *section, const char *key);
 ini_config *ini_parse(const char *filepath);
 ini_config *ini_parsebuf(const char *buf);
 
-#ifdef _DEBUG
+// #ifdef _DEBUG
 #include "log.h"
 #include <stddef.h>
 
@@ -64,8 +64,8 @@ static void ini_dump_config(ini_config *cfg)
         cur_section = cur_section->next;
     }
 }
-#else
-#define ini_dump_config(...)
-#endif // _DEBUG
+// #else
+// #define ini_dump_config(...)
+// #endif // _DEBUG
 
 #endif // _LIB_INI_H
