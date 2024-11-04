@@ -2,8 +2,10 @@
 #include <stdint.h>
 #include <vcmp/websockets/frame.h>
 
-/* WS operates on big endian */
+/* macOS already has *to*ll, which causes the build to fail */
+#ifndef __APPLE__
 
+/* WS operates on big endian */
 static uint64_t ntohll(uint64_t net)
 {
     uint32_t high = ntohl((uint32_t)(net >> 32));
@@ -17,6 +19,8 @@ static uint64_t htonll(uint64_t host)
     uint32_t low = htonl((uint32_t)(host & 0xFFFFFFFF));
     return ((uint64_t)high << 32) | low;
 }
+
+#endif /* __APPLE__ */
 
 static void ws_payload_unmask(uint8_t *payload, const uint64_t payload_len,
                               uint8_t *masking_key)
