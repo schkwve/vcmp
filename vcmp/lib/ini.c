@@ -455,12 +455,6 @@ ini_config *ini_parsebuf(const char *buf)
                           (current_section[0] == '\0') ? NULL : current_section,
                           current_key, current_value);
 
-            // TODO: Remove this
-            log_debug("[%s]: %s=%s",
-                      (current_section[0] == '\0') ? "(Global)"
-                                                   : current_section,
-                      current_key, current_value);
-
             state = READY_FOR_DATA;
             break;
         }
