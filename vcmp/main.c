@@ -1,4 +1,5 @@
 #include "lib/log.h"
+#include "lib/ini.h"
 #include <event2/event.h>
 #include <unistd.h>
 #include <vcmp/api.h>
@@ -7,6 +8,15 @@
 int main()
 {
     log_info("=== VCMP ===");
+
+    ini_config *cfg = ini_parse("/Users/schkwve/projects/vcmp/settings.ini");
+    if (cfg == NULL) {
+      log_fatal("Invalid configuration");
+      return -1;
+    }
+    ini_dump_config(cfg);
+    //    printf("%s\n", ini_get_value(cfg, "API", "IP"));
+    return -1;
 
     // Seed rand
     struct timespec ts;

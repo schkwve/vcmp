@@ -22,6 +22,7 @@ add_executable(vcmp_client main.c
     src/util/randdata.c
 
     lib/log.c
+    lib/ini.c
     lib/yyjson.c
 )
 target_include_directories(vcmp_client PUBLIC include ${UUID_INCLUDE_DIRS})
