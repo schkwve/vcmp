@@ -53,10 +53,6 @@ static void accept_cb(struct bufferevent *bev, struct ws_client *client)
     }
     log_debug("Accepted a WebSocket client!");
     api_user_bev = bev;
-
-    // Testing
-    log_info("%d", vcmp_api_event_user(VCMP_EVENT_USER_JOIN, "test"));
-    log_info("%d", vcmp_api_event_user(VCMP_EVENT_USER_JOIN, "test2"));
 }
 
 static void close_cb(struct bufferevent *bev, void *ctx)
