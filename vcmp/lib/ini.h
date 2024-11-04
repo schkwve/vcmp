@@ -54,7 +54,7 @@ static void ini_dump_config(ini_config *cfg)
 
     cur_section = cfg->sections;
     while (cur_section != NULL) {
-        log_debug("\n[%s]", cur_section->name);
+        log_debug("[%s]", cur_section->name);
 
         cur_keyval = cur_section->keyvals;
         while (cur_keyval != NULL) {

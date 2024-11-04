@@ -28,26 +28,22 @@ struct ini_section *new_section(const char *name)
 /**
  * Appends a new section to an existing list.
  */
-void add_section(struct ini_section *root, const char *name)
+struct ini_section *add_section(struct ini_section **root, const char *name)
 {
-    struct ini_section *cur_section;
+    struct ini_section **cur_section;
 
     if (root == NULL) {
         log_error("Invalid section root specified.");
-        return;
-    }
-
-    if (name == NULL || name[0] == '\0') {
-        log_error("Invalid section name specified.");
-        return;
+        return NULL;
     }
 
     cur_section = root;
-    while (cur_section != NULL) {
-        cur_section = cur_section->next;
+    while (*cur_section != NULL) {
+        cur_section = &(*cur_section)->next;
     }
 
-    cur_section->next = new_section(name);
+    *cur_section = new_section(name);
+    return *cur_section;
 }
 
 /**
@@ -73,8 +69,6 @@ struct ini_keyval *new_keyval(const char *name, const char *value)
  */
 struct ini_section *find_or_create_section(ini_config *cfg, const char *name)
 {
-    struct ini_section *cur_section;
-
     if (cfg == NULL) {
         log_error("Invalid configuration root specified.");
         return NULL;
@@ -85,15 +79,7 @@ struct ini_section *find_or_create_section(ini_config *cfg, const char *name)
         return NULL;
     }
 
-    cur_section = cfg->sections;
-    while (cur_section != NULL) {
-        if (strcmp(cur_section->name, name) == 0) {
-            return cur_section;
-        }
-    }
-
-    cur_section = new_section(name);
-    return cur_section;
+    return add_section(&cfg->sections, name);
 }
 
 /**
@@ -126,26 +112,16 @@ struct ini_section *find_section(ini_config *cfg, const char *name)
 /**
  * Appends a new key-value pair to an existing list.
  */
-void add_keyval(struct ini_keyval *root, const char *name, const char *value)
+void add_keyval(struct ini_keyval **root, const char *name, const char *value)
 {
-    struct ini_keyval *cur_keyval;
-
-    if (root == NULL) {
-        log_error("Invalid key-value pair root specified.");
-        return;
-    }
-
-    if (name == NULL || name[0] == '\0') {
-        log_error("Invalid key name specified.");
-        return;
-    }
+    struct ini_keyval **cur_keyval;
 
     cur_keyval = root;
-    while (cur_keyval != NULL) {
-        cur_keyval = cur_keyval->next;
+    while (*cur_keyval != NULL) {
+        *cur_keyval = (*cur_keyval)->next;
     }
 
-    cur_keyval->next = new_keyval(name, value);
+    *cur_keyval = new_keyval(name, value);
 }
 
 /**
@@ -154,8 +130,6 @@ void add_keyval(struct ini_keyval *root, const char *name, const char *value)
 void assign_keyval_to_section(struct ini_section *section, const char *name,
                               const char *value)
 {
-    struct ini_keyval *cur_keyval;
-
     if (section == NULL) {
         log_error("Invalid section specified.");
         return;
@@ -166,12 +140,7 @@ void assign_keyval_to_section(struct ini_section *section, const char *name,
         return;
     }
 
-    cur_keyval = section->keyvals;
-    while (cur_keyval != NULL) {
-        cur_keyval = cur_keyval->next;
-    }
-
-    cur_keyval = new_keyval(name, value);
+    add_keyval(&section->keyvals, name, value);
 }
 
 /**
@@ -180,7 +149,6 @@ void assign_keyval_to_section(struct ini_section *section, const char *name,
 void assign_keyval_to_root(struct ini_config *cfg, const char *name,
                            const char *value)
 {
-    struct ini_keyval *cur_keyval;
     if (cfg == NULL) {
         log_error("Invalid configuration root specified.");
         return;
@@ -191,12 +159,7 @@ void assign_keyval_to_root(struct ini_config *cfg, const char *name,
         return;
     }
 
-    cur_keyval = cfg->global_keyvals;
-    while (cur_keyval != NULL) {
-        cur_keyval = cur_keyval->next;
-    }
-
-    cur_keyval = new_keyval(name, value);
+    add_keyval(&cfg->global_keyvals, name, value);
 }
 
 /**
