@@ -49,17 +49,22 @@ function parseData(data) {
 socket.addEventListener("open", (event) => {
     addMember("You");
     console.log("Websockets opened");
+	document.getElementById("messageInput").disabled = false;
 });
+
 socket.addEventListener("message", (event) => {
     console.log("Message from server ", event.data);
     parseData(event.data)
 });
+
 socket.addEventListener("error", (event) => {
     console.error("WebSocket error observed:", event);
 });
+
 socket.addEventListener("close", (event) => {
     removeMember("You");
     console.log("Websockets closed");
+	document.getElementById("messageInput").disabled = true;
 });
 
 sendButton.addEventListener("click", () => {
