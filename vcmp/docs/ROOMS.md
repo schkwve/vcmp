@@ -1,18 +1,23 @@
-# Chat Rooms Documentation
+# Chat Room Documentation
 
-## Basic Structure
-Chat rooms have a Name, Description, and a UUID. The Name and Description are only used for Display and have no functions in the protocol. A chat room can have an unlimited members, though the maximum size is defined based on the resources of the host. Since VCMP is based on Peer2Peer there is not server / room actually hosting it the creator of the room is hosting the room. The member list can be a linked list. Below is an example in the C programming language that implements a room. These rooms can be created, destoryed and edited. The usernames have a limit of 256 characters, and the room name has a limit of 64 characters, and the room description can be 256 characters long. These limitations can be changed in version 2.
+## Overview
+Each chat room includes a Name, Description, and a unique UUID. The Name and Description are for display purposes only and do not impact the protocol functionality. Chat rooms have no strict member limit, though maximum capacity depends on the host’s resources. As VCMP operates on a Peer-to-Peer (P2P) model, there is no centralized server or dedicated host for rooms; instead, the room’s creator serves as the host.
 
-### C example
-The member list struct:
+## Member List Structure
+The member list is implemented as a linked list, allowing dynamic growth as members join. Usernames are limited to 256 characters, room names to 64 characters, and descriptions to 256 characters, though these limits can be adjusted in future versions.
+
+## Example Implementation (C)
+
+**Member List Structure**:
 ```c
 struct member {
     uint64_t uuid[2];
     char username[32];
     struct member* next;
 };
+
 ```
-The room struct:
+**Room Structure**:
 ```c
 struct room {
     uint64_t uuid[2];
