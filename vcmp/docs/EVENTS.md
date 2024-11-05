@@ -39,7 +39,7 @@ Example:
 This tells the frontend that the user `Example` send the message `Hello, world!` at the UNIX timestamp `1730736486`
 
 ## Event: user_invite
-The `user_invite` event is triggered when the `sender` is inviting the `target` to join the room with the UUID in `room`
+The `user_invite` event is triggered when the `sender` is inviting you to join the room with the UUID in `room`
 Example:
 ```json
 {
@@ -48,7 +48,7 @@ Example:
     "room": "fc3667cb-fe5b-4685-8ef7-f780deaa322e"
 }
 ```
-In this case the user `kevinalavik` invites the user `splexas` to join the room with the UUID `fc3667cb-fe5b-4685-8ef7-f780deaa322e`
+In this case the user `kevinalavik` invites the you to join the room with the UUID `fc3667cb-fe5b-4685-8ef7-f780deaa322e`
 
 # Events from Backend to Frontend
 

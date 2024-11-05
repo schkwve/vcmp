@@ -6,13 +6,15 @@ const sendButton = document.getElementById("sendButton");
 const modeToggle = document.getElementById("modeToggle");
 const membersList = document.getElementById("membersList");
 
-function addMember(username) {
-    const existingMember = document.querySelector(`#membersList li[data-username="${username}"]`);
+const username = "Finally";
+
+function addMember(user_name, fmt_user) {
+    const existingMember = document.querySelector(`#membersList li[data-username="${user_name}"]`);
     
     if (!existingMember) {
         const listItem = document.createElement("li");
-        listItem.textContent = username;
-        listItem.dataset.username = username;
+        listItem.innerHTML = fmt_user.replace("${username}", user_name);;
+        listItem.dataset.username = user_name;
         membersList.appendChild(listItem);
     }
 }
@@ -36,9 +38,16 @@ function parseData(data) {
         }
         
         if (pdata.event == "user_join") {
-            addMember(pdata.username);
+            addMember(pdata.username, pdata.username);
         } else if (pdata.event == "user_leave") {
             removeMember(pdata.username);
+        } else if (pdata.event == "user_message") {
+            const message = pdata.message;
+            if (message.trim()) {
+                chatLog.innerHTML += `<div><b>${pdata.username}</b>: ${message}</div>`;
+                messageInput.value = "";  // Clear the input
+                chatLog.scrollTop = chatLog.scrollHeight;  // Scroll to the bottom
+            }
         }
 
     } catch (error) {
@@ -47,9 +56,12 @@ function parseData(data) {
 }
 
 socket.addEventListener("open", (event) => {
-    addMember("You");
+    addMember(username, "<b>${username}</b>");
     console.log("Websockets opened");
 	document.getElementById("messageInput").disabled = false;
+
+    // test
+    parseData('{"event": "user_message", "username": "Example", "timestamp": 1730736486, "message": "Hello, world!", "room": "fc3667cb-fe5b-4685-8ef7-f780deaa322e"}');
 });
 
 socket.addEventListener("message", (event) => {
@@ -70,7 +82,7 @@ socket.addEventListener("close", (event) => {
 sendButton.addEventListener("click", () => {
     const message = messageInput.value;
     if (message.trim()) {
-        chatLog.innerHTML += `<div>${message}</div>`;
+        chatLog.innerHTML += `<div><b>${username}</b>: ${message}</div>`;
         messageInput.value = "";  // Clear the input
         chatLog.scrollTop = chatLog.scrollHeight;  // Scroll to the bottom
     }
