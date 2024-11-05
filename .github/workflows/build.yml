@@ -18,7 +18,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y cmake
-        git pull https://github.com/libevent/libevent.git
+        git clone https://github.com/libevent/libevent.git
         cd libevent
         mkdir build && cd build
         cmake ..
