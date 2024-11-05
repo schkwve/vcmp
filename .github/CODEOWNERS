@@ -1,0 +1,6 @@
+vcmp/src/       @splexas @KevinAlavik
+vcmp/include/   @splexas @KevinAlavik
+vcmp/lib/       @splexas @KevinAlavik
+vcmp/frontend/  @KevinAlavik @RaphtikAtGHG
+vcmp/docs       @RaphtikAtGHG
+*.md            @RaphtikAtGHG
