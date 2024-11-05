@@ -6,7 +6,7 @@ const sendButton = document.getElementById("sendButton");
 const modeToggle = document.getElementById("modeToggle");
 const membersList = document.getElementById("membersList");
 
-const username = "Finally";
+let username = "";
 
 function addMember(user_name, fmt_user) {
     const existingMember = document.querySelector(`#membersList li[data-username="${user_name}"]`);
@@ -56,7 +56,6 @@ function parseData(data) {
 }
 
 socket.addEventListener("open", (event) => {
-    addMember(username, "<b>${username}</b>");
     console.log("Websockets opened");
 	document.getElementById("messageInput").disabled = false;
 
@@ -88,6 +87,10 @@ sendButton.addEventListener("click", () => {
     }
 });
 
+messageInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") sendButton.click();
+});
+
 modeToggle.addEventListener("click", () => {
     document.body.classList.toggle("light-mode");
     
@@ -99,3 +102,19 @@ modeToggle.addEventListener("click", () => {
     }
 });
 
+// Show the popup on load
+window.onload = () => {
+    document.getElementById("overlay").style.display = "block";
+    document.getElementById("usernamePopup").style.display = "block";
+};
+
+// Handle username submission
+document.getElementById("submitUsername").addEventListener("click", () => {
+    const usernameInput = document.getElementById("usernameInput").value.trim();
+    if (usernameInput) {
+        username = usernameInput;
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("usernamePopup").style.display = "none";
+        addMember(username, "<b>${username}</b>");
+    }
+});
