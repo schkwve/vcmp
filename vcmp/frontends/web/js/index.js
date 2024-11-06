@@ -1,5 +1,7 @@
 const socket = new WebSocket("ws://localhost:44444");
 
+const hostname = document.getElementById("hostname");
+const port = document.getElementById("port");
 const chatLog = document.getElementById("chatLog");
 const messageInput = document.getElementById("messageInput");
 const sendButton = document.getElementById("sendButton");
@@ -7,6 +9,9 @@ const modeToggle = document.getElementById("modeToggle");
 const membersList = document.getElementById("membersList");
 
 let username = "";
+
+let isConnected = false; // to peer
+let isConnectionScheduled = false;
 
 function addMember(user_name, fmt_user) {
     const existingMember = document.querySelector(`#membersList li[data-username="${user_name}"]`);
@@ -37,7 +42,13 @@ function parseData(data) {
             console.error("Data is not found in the Message!");
         }
         
-        if (pdata.event == "user_join") {
+        if (pdata.event == "connect_ok") {
+            // handle connect_ok
+            chatLog.innerHTML += `<div><b>Connected!<b></div>`;
+        } else if (pdata.event == "connect_fail") {
+            // handle connect_fail
+            chatLog.innerHTML += `<div><b>Failed to connect<b></div>`;
+        } else if (pdata.event == "user_join") {
             addMember(pdata.username, pdata.username);
         } else if (pdata.event == "user_leave") {
             removeMember(pdata.username);
@@ -80,10 +91,24 @@ socket.addEventListener("close", (event) => {
 
 sendButton.addEventListener("click", () => {
     const message = messageInput.value;
-    if (message.trim()) {
-        chatLog.innerHTML += `<div><b>${username}</b>: ${message}</div>`;
-        messageInput.value = "";  // Clear the input
-        chatLog.scrollTop = chatLog.scrollHeight;  // Scroll to the bottom
+    if (message.trim() && !isConnectionScheduled) {
+        if (!isConnected) {
+            // Request connecting to the specified peer
+            if (hostname.value.trim() && port.value.trim()) {
+                socket.send(JSON.stringify({event: "connect", hostname: hostname.value, port: parseInt(port.value, 10)}))
+                chatLog.innerHTML += `<div><b>Connecting to the peer...</b></div>`;
+                isConnectionScheduled = true;
+            }
+            else {
+                alert("Please fill the hostname and port");
+            }
+            // leave messageInput unchanged
+        }
+        else {
+            chatLog.innerHTML += `<div><b>${username}</b>: ${message}</div>`;
+            messageInput.value = "";  // Clear the input
+            chatLog.scrollTop = chatLog.scrollHeight;  // Scroll to the bottom
+        }
     }
 });
 
