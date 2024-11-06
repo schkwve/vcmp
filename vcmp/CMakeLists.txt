@@ -27,3 +27,12 @@ add_executable(vcmp_client main.c
 )
 target_include_directories(vcmp_client PUBLIC include ${UUID_INCLUDE_DIRS})
 target_link_libraries(vcmp_client PRIVATE libevent::core ${UUID_LIBRARIES} OpenSSL::Crypto)
+
+# Default configuration
+add_custom_target(copy_config ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${PROJECT_SOURCE_DIR}/resources
+    ${PROJECT_BINARY_DIR}/resources
+    COMMENT "Copying default configuration files...")
+
+add_dependencies(vcmp_client copy_config)

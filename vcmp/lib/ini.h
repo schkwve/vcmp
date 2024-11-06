@@ -20,14 +20,14 @@ typedef struct ini_config {
 } ini_config;
 
 ini_config *ini_create(void);
-void ini_free(ini_config *cfg);
+void ini_free(ini_config **cfg);
 
 char *ini_get_value(ini_config *cfg, const char *section, const char *key);
 
 ini_config *ini_parse(const char *filepath);
 ini_config *ini_parsebuf(const char *buf);
 
-// #ifdef _DEBUG
+#ifndef NDEBUG
 #include "log.h"
 #include <stddef.h>
 
@@ -64,8 +64,8 @@ static void ini_dump_config(ini_config *cfg)
         cur_section = cur_section->next;
     }
 }
-// #else
-// #define ini_dump_config(...)
-// #endif // _DEBUG
+#else
+#define ini_dump_config(...)
+#endif // NDEBUG
 
 #endif // _LIB_INI_H

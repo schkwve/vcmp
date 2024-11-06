@@ -47,28 +47,13 @@ struct ini_section *add_section(struct ini_section **root, const char *name)
 }
 
 /**
- * Creates a new key-value list.
- */
-struct ini_keyval *new_keyval(const char *name, const char *value)
-{
-    struct ini_keyval *new = malloc(sizeof(struct ini_keyval));
-    if (new == NULL) {
-        log_error("Failed to allocate memory for new key-value pair.");
-        return NULL;
-    }
-
-    new->name = strdup(name);
-    new->value = strdup(value);
-    new->next = NULL;
-    return new;
-}
-
-/**
  * Returns a pointer to the section. If the specified section does not exist,
  * create one.
  */
 struct ini_section *find_or_create_section(ini_config *cfg, const char *name)
 {
+    struct ini_section *cur_section;
+
     if (cfg == NULL) {
         log_error("Invalid configuration root specified.");
         return NULL;
@@ -77,6 +62,14 @@ struct ini_section *find_or_create_section(ini_config *cfg, const char *name)
     if (name == NULL || name[0] == '\0') {
         log_error("Invalid section name specified.");
         return NULL;
+    }
+
+    cur_section = cfg->sections;
+    while (cur_section != NULL) {
+        if (strcmp(cur_section->name, name) == 0) {
+            return cur_section;
+        }
+        cur_section = cur_section->next;
     }
 
     return add_section(&cfg->sections, name);
@@ -112,15 +105,37 @@ struct ini_section *find_section(ini_config *cfg, const char *name)
 }
 
 /**
+ * Creates a new key-value list.
+ */
+struct ini_keyval *new_keyval(const char *name, const char *value)
+{
+    struct ini_keyval *new = malloc(sizeof(struct ini_keyval));
+    if (new == NULL) {
+        log_error("Failed to allocate memory for new key-value pair.");
+        return NULL;
+    }
+
+    new->name = strdup(name);
+    new->value = strdup(value);
+    new->next = NULL;
+    return new;
+}
+
+/**
  * Appends a new key-value pair to an existing list.
  */
 void add_keyval(struct ini_keyval **root, const char *name, const char *value)
 {
     struct ini_keyval **cur_keyval;
 
+    if (root == NULL) {
+        log_error("Invalid key-value pair root specified.");
+        return;
+    }
+
     cur_keyval = root;
     while (*cur_keyval != NULL) {
-        *cur_keyval = (*cur_keyval)->next;
+        cur_keyval = &(*cur_keyval)->next;
     }
 
     *cur_keyval = new_keyval(name, value);
@@ -215,22 +230,24 @@ ini_config *ini_create(void)
 /**
  * Free the configuration structure.
  */
-void ini_free(ini_config *cfg)
+void ini_free(ini_config **cfg)
 {
     struct ini_section *cur_section, *next_section;
     struct ini_keyval *cur_keyval, *next_keyval;
 
-    if (!cfg)
+    if (cfg == NULL || *cfg == NULL)
         return;
 
-    cur_keyval = cfg->global_keyvals;
+    cur_keyval = (*cfg)->global_keyvals;
     while (cur_keyval != NULL) {
         next_keyval = cur_keyval->next;
+        free(cur_keyval->name);
+        free(cur_keyval->value);
         free(cur_keyval);
         cur_keyval = next_keyval;
     }
 
-    cur_section = cfg->sections;
+    cur_section = (*cfg)->sections;
     if (cur_section == NULL) {
         goto final;
     }
@@ -253,7 +270,8 @@ void ini_free(ini_config *cfg)
         cur_section = next_section;
     }
 final:
-    free(cfg);
+    free(*cfg);
+    *cfg = NULL;
 }
 
 /**
@@ -263,6 +281,10 @@ final:
  *   the function will return NULL.
  *
  * Keys and section names are case-sensitive.
+ *
+ * IMPORTANT:
+ * This function stores the returned string on the heap.
+ * Remember to free the string after you're done with it.
  */
 char *ini_get_value(ini_config *cfg, const char *section, const char *key)
 {
@@ -292,7 +314,7 @@ char *ini_get_value(ini_config *cfg, const char *section, const char *key)
 
     while (cur_keyval != NULL) {
         if (strcmp(cur_keyval->name, key) == 0) {
-            return cur_keyval->value;
+            return strdup(cur_keyval->value);
         }
 
         cur_keyval = cur_keyval->next;
@@ -487,7 +509,7 @@ ini_config *ini_parsebuf(const char *buf)
 
 fail:
     if (cfg) {
-        ini_free(cfg);
+        ini_free(&cfg);
     }
     return NULL;
 }

@@ -309,7 +309,6 @@ char *ini_get_value(ini_config *cfg, const char *section, const char *key)
         if (strcmp(cur_keyval->name, key) == 0) {
             return cur_keyval->value;
         }
-
         cur_keyval = cur_keyval->next;
     }
 
@@ -475,7 +474,6 @@ int main(void)
     char *tmp;
 
     printf("Test 1: ini_get_value() --");
-    fflush(stdout);
     tmp = ini_get_value(cfg, "section1", "coolvar");
     if (strcmp(tmp, "one") != 0) {
         printf(" FAILED!\nExpected: one; Got: %s\n", tmp);
@@ -485,7 +483,6 @@ int main(void)
     }
 
     printf("Test 2: ini_get_value() --");
-    fflush(stdout);
     tmp = ini_get_value(cfg, "section2", "coolvar");
     if (tmp == NULL) {
         printf(" FAILED!\nExpected: two; Got: (not found)\n");
@@ -495,6 +492,15 @@ int main(void)
     }
     else {
         printf(" PASSED\n");
+    }
+
+    printf("Test 3: ini_get_value() --");
+    tmp = ini_get_value(cfg, "section2", "test");
+    if (strcmp(tmp, "test") != 0) {
+        printf(" FAILED!\nExpected: test; Got: %s\n", tmp);
+    }
+    else {
+        puts(" PASSED");
     }
 
     printf("All tests done! Freeing allocated memory...\n");
