@@ -1,18 +1,25 @@
 const socket = new WebSocket("ws://localhost:44444");
 
+const hostname = document.getElementById("hostname");
+const port = document.getElementById("port");
 const chatLog = document.getElementById("chatLog");
 const messageInput = document.getElementById("messageInput");
 const sendButton = document.getElementById("sendButton");
 const modeToggle = document.getElementById("modeToggle");
 const membersList = document.getElementById("membersList");
 
-function addMember(username) {
-    const existingMember = document.querySelector(`#membersList li[data-username="${username}"]`);
+let username = "";
+
+let isConnected = false; // to peer
+let isConnectionScheduled = false;
+
+function addMember(user_name, fmt_user) {
+    const existingMember = document.querySelector(`#membersList li[data-username="${user_name}"]`);
     
     if (!existingMember) {
         const listItem = document.createElement("li");
-        listItem.textContent = username;
-        listItem.dataset.username = username;
+        listItem.innerHTML = fmt_user.replace("${username}", user_name);;
+        listItem.dataset.username = user_name;
         membersList.appendChild(listItem);
     }
 }
@@ -35,10 +42,23 @@ function parseData(data) {
             console.error("Data is not found in the Message!");
         }
         
-        if (pdata.event == "user_join") {
-            addMember(pdata.username);
+        if (pdata.event == "connect_ok") {
+            // handle connect_ok
+            chatLog.innerHTML += `<div><b>Connected!<b></div>`;
+        } else if (pdata.event == "connect_fail") {
+            // handle connect_fail
+            chatLog.innerHTML += `<div><b>Failed to connect<b></div>`;
+        } else if (pdata.event == "user_join") {
+            addMember(pdata.username, pdata.username);
         } else if (pdata.event == "user_leave") {
             removeMember(pdata.username);
+        } else if (pdata.event == "user_message") {
+            const message = pdata.message;
+            if (message.trim()) {
+                chatLog.innerHTML += `<div><b>${pdata.username}</b>: ${message}</div>`;
+                messageInput.value = "";  // Clear the input
+                chatLog.scrollTop = chatLog.scrollHeight;  // Scroll to the bottom
+            }
         }
 
     } catch (error) {
@@ -47,9 +67,11 @@ function parseData(data) {
 }
 
 socket.addEventListener("open", (event) => {
-    addMember("You");
     console.log("Websockets opened");
 	document.getElementById("messageInput").disabled = false;
+
+    // test
+    parseData('{"event": "user_message", "username": "Example", "timestamp": 1730736486, "message": "Hello, world!", "room": "fc3667cb-fe5b-4685-8ef7-f780deaa322e"}');
 });
 
 socket.addEventListener("message", (event) => {
@@ -69,11 +91,29 @@ socket.addEventListener("close", (event) => {
 
 sendButton.addEventListener("click", () => {
     const message = messageInput.value;
-    if (message.trim()) {
-        chatLog.innerHTML += `<div>${message}</div>`;
-        messageInput.value = "";  // Clear the input
-        chatLog.scrollTop = chatLog.scrollHeight;  // Scroll to the bottom
+    if (message.trim() && !isConnectionScheduled) {
+        if (!isConnected) {
+            // Request connecting to the specified peer
+            if (hostname.value.trim() && port.value.trim()) {
+                socket.send(JSON.stringify({event: "connect", hostname: hostname.value, port: parseInt(port.value, 10)}))
+                chatLog.innerHTML += `<div><b>Connecting to the peer...</b></div>`;
+                isConnectionScheduled = true;
+            }
+            else {
+                alert("Please fill the hostname and port");
+            }
+            // leave messageInput unchanged
+        }
+        else {
+            chatLog.innerHTML += `<div><b>${username}</b>: ${message}</div>`;
+            messageInput.value = "";  // Clear the input
+            chatLog.scrollTop = chatLog.scrollHeight;  // Scroll to the bottom
+        }
     }
+});
+
+messageInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") sendButton.click();
 });
 
 modeToggle.addEventListener("click", () => {
@@ -87,3 +127,19 @@ modeToggle.addEventListener("click", () => {
     }
 });
 
+// Show the popup on load
+window.onload = () => {
+    document.getElementById("overlay").style.display = "block";
+    document.getElementById("usernamePopup").style.display = "block";
+};
+
+// Handle username submission
+document.getElementById("submitUsername").addEventListener("click", () => {
+    const usernameInput = document.getElementById("usernameInput").value.trim();
+    if (usernameInput) {
+        username = usernameInput;
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("usernamePopup").style.display = "none";
+        addMember(username, "<b>${username}</b>");
+    }
+});

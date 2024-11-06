@@ -37,12 +37,6 @@ static void read_cb(struct bufferevent *bev, const uint8_t opcode,
         break;
     }
     };
-
-    char resp[] = "WebSockets!";
-    int r = ws_client_send(bev, WS_OPCODE_TEXT, resp, sizeof(resp) - 1);
-    if (r != 0) {
-        log_warn("Failed to deliver a message to the client!");
-    }
 }
 
 static void accept_cb(struct bufferevent *bev, struct ws_client *client)

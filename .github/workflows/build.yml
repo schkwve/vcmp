@@ -1,0 +1,41 @@
+name: CMake Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake
+        git clone https://github.com/libevent/libevent.git
+        cd libevent
+        mkdir build && cd build
+        cmake ..
+        cmake --build .
+        sudo make install
+
+    - name: Create build directory
+      run: mkdir -p vcmp/build
+
+    - name: Configure with CMake
+      working-directory: vcmp/build
+      run: cmake ..
+
+    - name: Build project
+      working-directory: vcmp/build
+      run: cmake --build .
+
+    - name: Run tests
+      working-directory: vcmp/build
+      run: ctest --output-on-failure

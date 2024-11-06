@@ -28,7 +28,7 @@ add_executable(vcmp_client main.c
 target_include_directories(vcmp_client PUBLIC include ${UUID_INCLUDE_DIRS})
 target_link_libraries(vcmp_client PRIVATE libevent::core ${UUID_LIBRARIES} OpenSSL::Crypto)
 
-# Default configuration
+# Resources
 add_custom_target(copy_config ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${PROJECT_SOURCE_DIR}/resources
@@ -36,3 +36,19 @@ add_custom_target(copy_config ALL
     COMMENT "Copying default configuration files...")
 
 add_dependencies(vcmp_client copy_config)
+
+### TESTS ###
+
+enable_testing()
+
+add_executable(test_rsa tests/test_rsa.c)
+target_link_libraries(test_rsa PRIVATE OpenSSL::Crypto)
+add_test(NAME test_rsa COMMAND $<TARGET_FILE:test_rsa>)
+
+# Requires TOR
+
+# add_executable(test_socks5 tests/test_socks5.c src/socks5.c lib/log.c)
+# target_include_directories(test_socks5 PUBLIC include)
+# target_link_libraries(test_socks5 PRIVATE libevent::core)
+# add_test(NAME test_socks5 COMMAND $<TARGET_FILE:test_socks5>)
+
