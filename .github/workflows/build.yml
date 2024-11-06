@@ -35,3 +35,7 @@ jobs:
     - name: Build project
       working-directory: vcmp/build
       run: cmake --build .
+
+    - name: Run tests
+      working-directory: vcmp/build
+      run: ctest --output-on-failure

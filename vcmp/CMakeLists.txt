@@ -27,3 +27,16 @@ add_executable(vcmp_client main.c
 )
 target_include_directories(vcmp_client PUBLIC include ${UUID_INCLUDE_DIRS})
 target_link_libraries(vcmp_client PRIVATE libevent::core ${UUID_LIBRARIES} OpenSSL::Crypto)
+
+enable_testing()
+
+add_executable(test_rsa tests/test_rsa.c)
+target_link_libraries(test_rsa PRIVATE OpenSSL::Crypto)
+add_test(NAME test_rsa COMMAND $<TARGET_FILE:test_rsa>)
+
+# Requires TOR
+
+# add_executable(test_socks5 tests/test_socks5.c src/socks5.c lib/log.c)
+# target_include_directories(test_socks5 PUBLIC include)
+# target_link_libraries(test_socks5 PRIVATE libevent::core)
+# add_test(NAME test_socks5 COMMAND $<TARGET_FILE:test_socks5>)

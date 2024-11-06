@@ -151,34 +151,35 @@ int main()
 {
     EVP_PKEY *pkey = NULL;
     if (gen_rsa(&pkey) != 0) {
-        printf("failed to gen rsa keys\n");
+        fprintf(stderr, "failed to gen rsa keys\n");
         return 1;
     }
 
-    printf("generated rsa keys!\n");
+    fprintf(stdout, "generated rsa keys!\n");
 
     int pub_key_len = 0;
     uint8_t *pub_key = get_rsa_der_pub(pkey, &pub_key_len);
     if (!pub_key) {
-        printf("failed to get rsa pub key\n");
+        fprintf(stderr, "failed to get rsa pub key\n");
         EVP_PKEY_free(pkey);
         return 1;
     }
 
-    printf("rsa der pub key len: %d\n", pub_key_len);
+    fprintf(stdout, "rsa der pub key len: %d\n", pub_key_len);
 
     char data[] = "rsa test 123";
+
     size_t encrypted_len = 0;
     uint8_t *encrypted = rsa_encrypt((uint8_t *)data, sizeof(data) - 1, pub_key,
                                      pub_key_len, &encrypted_len);
     if (!encrypted) {
-        printf("failed to encrypt data\n");
+        fprintf(stderr, "failed to encrypt data\n");
         OPENSSL_free(pub_key);
         EVP_PKEY_free(pkey);
         return 1;
     }
 
-    printf("encrypted data len: %lu\n", encrypted_len);
+    fprintf(stdout, "encrypted data len: %lu\n", encrypted_len);
 
     // decrypt
     size_t decrypted_len = 0;
@@ -186,15 +187,23 @@ int main()
         rsa_decrypt(pkey, encrypted, encrypted_len, &decrypted_len);
 
     if (!decrypted) {
-        printf("failed to decrypt data\n");
+        fprintf(stderr, "failed to decrypt data\n");
         free(encrypted);
         OPENSSL_free(pub_key);
         EVP_PKEY_free(pkey);
         return 1;
     }
 
-    printf("decrypted data!\n");
-    printf("%.*s\n", (int)decrypted_len, decrypted);
+    fprintf(stdout, "decrypted data, len: %lu\n", decrypted_len);
+
+    if (strncmp((const char *)decrypted, data, decrypted_len) != 0) {
+        fprintf(stderr, "decrypted data doesn't match to original data\n");
+        free(decrypted);
+        free(encrypted);
+        OPENSSL_free(pub_key);
+        EVP_PKEY_free(pkey);
+        return 1;
+    }
 
     free(decrypted);
     free(encrypted);
